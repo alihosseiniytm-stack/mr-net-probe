@@ -4,18 +4,24 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Public exchange endpoints reachable from this runner?
+      - name: More exchange endpoints
         run: |
-          curl -s https://api.ipify.org; echo " <- runner IP"
           for u in \
-            "binance-spot|https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
-            "binance-data-mirror|https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT" \
-            "binance-futures|https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
-            "bybit|https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT" \
-            "okx|https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP" \
-            "hyperliquid|https://api.hyperliquid.xyz/info" \
-            "binance-archive|https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2026-09-28.zip"; do
+            "bybit-bytick|https://api.bytick.com/v5/market/tickers?category=linear&symbol=BTCUSDT" \
+            "bybit-testnet-domain|https://api.bybit.nl/v5/market/tickers?category=linear&symbol=BTCUSDT" \
+            "binance-fapi1|https://fapi1.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
+            "binance-fapi3|https://fapi3.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
+            "binance-api1|https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
+            "binance-api-gcp|https://api-gcp.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
+            "binance-ws-mirror|https://data-stream.binance.vision/ws" \
+            "bitget|https://api.bitget.com/api/v2/mix/market/ticker?productType=USDT-FUTURES&symbol=BTCUSDT" \
+            "gate|https://api.gateio.ws/api/v4/futures/usdt/tickers?contract=BTC_USDT" \
+            "deribit|https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL" \
+            "coinbase|https://api.coinbase.com/v2/prices/BTC-USD/spot" \
+            "kraken|https://api.kraken.com/0/public/Ticker?pair=XBTUSD" \
+            "coinalyze|https://api.coinalyze.net/v1/exchanges" \
+            "coingecko-derivs|https://api.coingecko.com/api/v3/derivatives/exchanges?per_page=5" \
+            "bingx|https://open-api.bingx.com/openApi/swap/v2/quote/price?symbol=BTC-USDT"; do
             n=${u%%|*}; url=${u#*|}
-            if [ "$n" = hyperliquid ]; then code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H 'content-type: application/json' -d '{"type":"allMids"}' "$url"); else code=$(curl -s -o /dev/null -w "%{http_code}" "$url"); fi
-            echo "$n => HTTP $code"
+            code=$(curl -s -m 15 -o /tmp/o -w "%{http_code}" "$url"); echo "$n => HTTP $code $(head -c 70 /tmp/o | tr '\n' ' ')"
           done
