@@ -4,24 +4,21 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: More exchange endpoints
+      - name: KuCoin and others
         run: |
           for u in \
-            "bybit-bytick|https://api.bytick.com/v5/market/tickers?category=linear&symbol=BTCUSDT" \
-            "bybit-testnet-domain|https://api.bybit.nl/v5/market/tickers?category=linear&symbol=BTCUSDT" \
-            "binance-fapi1|https://fapi1.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
-            "binance-fapi3|https://fapi3.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
-            "binance-api1|https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
-            "binance-api-gcp|https://api-gcp.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
-            "binance-ws-mirror|https://data-stream.binance.vision/ws" \
-            "bitget|https://api.bitget.com/api/v2/mix/market/ticker?productType=USDT-FUTURES&symbol=BTCUSDT" \
-            "gate|https://api.gateio.ws/api/v4/futures/usdt/tickers?contract=BTC_USDT" \
-            "deribit|https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL" \
-            "coinbase|https://api.coinbase.com/v2/prices/BTC-USD/spot" \
-            "kraken|https://api.kraken.com/0/public/Ticker?pair=XBTUSD" \
-            "coinalyze|https://api.coinalyze.net/v1/exchanges" \
-            "coingecko-derivs|https://api.coingecko.com/api/v3/derivatives/exchanges?per_page=5" \
-            "bingx|https://open-api.bingx.com/openApi/swap/v2/quote/price?symbol=BTC-USDT"; do
+            "kucoin-spot|https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT" \
+            "kucoin-futures|https://api-futures.kucoin.com/api/v1/ticker?symbol=XBTUSDTM" \
+            "kucoin-futures-funding|https://api-futures.kucoin.com/api/v1/funding-rate/XBTUSDTM/current" \
+            "coinbase-trades|https://api.exchange.coinbase.com/products/BTC-USD/trades?limit=3" \
+            "gate-spot-trades|https://api.gateio.ws/api/v4/spot/trades?currency_pair=BTC_USDT&limit=3" \
+            "gate-futures-trades|https://api.gateio.ws/api/v4/futures/usdt/trades?contract=BTC_USDT&limit=3" \
+            "gate-liquidations|https://api.gateio.ws/api/v4/futures/usdt/liq_orders?contract=BTC_USDT&limit=3" \
+            "okx-liquidations|https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&state=filled&uly=BTC-USDT" \
+            "okx-oi|https://www.okx.com/api/v5/public/open-interest?instType=SWAP&instId=BTC-USDT-SWAP" \
+            "bitget-oi|https://api.bitget.com/api/v2/mix/market/open-interest?productType=USDT-FUTURES&symbol=BTCUSDT" \
+            "mexc-spot|https://api.mexc.com/api/v3/ticker/price?symbol=BTCUSDT" \
+            "htx-spot|https://api.huobi.pro/market/detail/merged?symbol=btcusdt"; do
             n=${u%%|*}; url=${u#*|}
-            code=$(curl -s -m 15 -o /tmp/o -w "%{http_code}" "$url"); echo "$n => HTTP $code $(head -c 70 /tmp/o | tr '\n' ' ')"
+            code=$(curl -s -m 15 -o /tmp/o -w "%{http_code}" "$url"); echo "$n => HTTP $code $(head -c 90 /tmp/o | tr '\n' ' ')"
           done
