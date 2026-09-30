@@ -1,0 +1,21 @@
+name: probe
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Public exchange endpoints reachable from this runner?
+        run: |
+          curl -s https://api.ipify.org; echo " <- runner IP"
+          for u in \
+            "binance-spot|https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT" \
+            "binance-data-mirror|https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT" \
+            "binance-futures|https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT" \
+            "bybit|https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT" \
+            "okx|https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP" \
+            "hyperliquid|https://api.hyperliquid.xyz/info" \
+            "binance-archive|https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2026-09-28.zip"; do
+            n=${u%%|*}; url=${u#*|}
+            if [ "$n" = hyperliquid ]; then code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H 'content-type: application/json' -d '{"type":"allMids"}' "$url"); else code=$(curl -s -o /dev/null -w "%{http_code}" "$url"); fi
+            echo "$n => HTTP $code"
+          done
